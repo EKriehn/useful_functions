@@ -1,15 +1,18 @@
 # gets users from an ad group and org. Adds any users from the org that are in the target division and aren't already members of the ad group.
 
+# set variables
 $department = "Television"
 $adGroup = "HTV 001 AZR HTV General East US 2 WVD Access Group"
 $searchBase = "dc=companynet,dc=org"
 
+# populate site users and ad group members
 $siteAdUsers = Get-ADUser -Filter "enabled -eq 'true'" -Properties mail,division -SearchBase $searchBase
 $adGroupMembers = Get-ADGroupMember -Identity $adGroup
 
-# select department users from all site users
+# select matching division users from all site users
 $adUsers = $siteAdUsers | Where-Object -Property division -EQ $department
 
+# if selected division users are not present in the ad group then add them 
 $count = 1
 foreach ($adUser in $adUsers) {
         If ($adGroupMembers.SID -notcontains $adUser.SID) {
